@@ -37,12 +37,14 @@ signoz-docker/
 
 | 服务 | 镜像 | 说明 |
 |------|------|------|
-| init-clickhouse | `clickhouse/clickhouse-server:25.5.6` | 初始化脚本（一次性） |
-| zookeeper-1 | `signoz/zookeeper:3.7.1` | ClickHouse 协调服务 |
-| clickhouse | `clickhouse/clickhouse-server:25.5.6` | 时序数据库 |
-| signoz | `signoz/signoz:v0.113.0` | SigNoz 主服务（Web UI + API） |
-| otel-collector | `signoz/signoz-otel-collector:v0.144.1` | OpenTelemetry 数据收集器 |
-| signoz-telemetrystore-migrator | `signoz/signoz-otel-collector:v0.144.1` | 数据库迁移工具（一次性） |
+| init-clickhouse | `clickhouse/clickhouse-server:${CLICKHOUSE_TAG}` | 初始化脚本（一次性） |
+| zookeeper-1 | `signoz/zookeeper:${ZOOKEEPER_TAG}` | ClickHouse 协调服务 |
+| clickhouse | `clickhouse/clickhouse-server:${CLICKHOUSE_TAG}` | 时序数据库 |
+| signoz | `signoz/signoz:${VERSION}` | SigNoz 主服务（Web UI + API） |
+| otel-collector | `signoz/signoz-otel-collector:${OTELCOL_TAG}` | OpenTelemetry 数据收集器 |
+| signoz-telemetrystore-migrator | `signoz/signoz-otel-collector:${OTELCOL_TAG}` | 数据库迁移工具（一次性） |
+
+所有镜像版本均通过 `.env` 配置，未设置时使用 compose 文件中的默认值。
 
 ## 暴露端口
 
@@ -79,8 +81,10 @@ cd /opt/instance-a && docker compose up -d
 | `OTLP_GRPC_PORT` | OTLP gRPC 接收端口 | `4317` |
 | `OTLP_HTTP_PORT` | OTLP HTTP 接收端口 | `4318` |
 | `JWT_SECRET` | JWT 签名密钥（生产环境务必修改） | `secret` |
-| `VERSION` | SigNoz 镜像版本 | `v0.113.0` |
-| `OTELCOL_TAG` | OTel Collector 镜像版本 | `v0.144.1` |
+| `VERSION` | SigNoz 镜像版本 | `v0.128.0` |
+| `OTELCOL_TAG` | OTel Collector 镜像版本 | `v0.144.5` |
+| `CLICKHOUSE_TAG` | ClickHouse 镜像版本（建议跟随 SigNoz 官方钉定版本） | `25.5.6` |
+| `ZOOKEEPER_TAG` | ZooKeeper 镜像版本（建议跟随 SigNoz 官方钉定版本） | `3.7.1` |
 
 ## 多实例部署
 
@@ -114,8 +118,10 @@ SIGNOZ_PORT=8082
 OTLP_GRPC_PORT=4337
 OTLP_HTTP_PORT=4338
 JWT_SECRET=your-secret-here
-VERSION=v0.113.0
-OTELCOL_TAG=v0.144.1
+VERSION=v0.128.0
+OTELCOL_TAG=v0.144.5
+CLICKHOUSE_TAG=25.5.6
+ZOOKEEPER_TAG=3.7.1
 ```
 
 ## 常用运维命令
@@ -134,7 +140,7 @@ docker compose down
 # 停止并清除所有数据（会丢失所有数据！）
 docker compose down && rm -rf data/
 
-# 更新镜像版本（修改 .env 中的 VERSION/OTELCOL_TAG 后）
+# 更新镜像版本（修改 .env 中的版本变量后）
 docker compose pull && docker compose up -d
 ```
 
